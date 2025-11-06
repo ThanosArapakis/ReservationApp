@@ -1,0 +1,46 @@
+﻿<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+  <!--.NET 9 packages. Most of them will work on .NET 8. If you need to, make the updates here individually.-->
+  <ItemGroup>
+    <!-- Static code analysis -->
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.8">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageVersion>
+	  
+	<!-- Entity Framework Core -->
+	<PackageVersion Include="Microsoft.EntityFrameworkCore" Version="9.0.8" />
+	<PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.8" />
+	<PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.8" />
+	<PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.8" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.8">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageVersion>
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.8" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.8" />
+    <PackageVersion Include="Moq" Version="4.20.72" />
+    <PackageVersion Include="NLog.Web.AspNetCore" Version="6.0.3" />
+    <PackageVersion Include="OpenMediator" Version="1.2.1" />
+    <PackageVersion Include="Refit.HttpClientFactory" Version="8.0.0" />
+    <PackageVersion Include="SonarAnalyzer.CSharp" Version="10.15.0.120848" />
+    <!-- Application -->
+
+    <!-- Infrastructure -->
+    <PackageVersion Include="EFCore.NamingConventions" Version="9.0.0" />
+    <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.19" />
+    <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
+    <!-- Web.Api -->
+    <PackageVersion Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.22.1" />
+    <PackageVersion Include="Swashbuckle.AspNetCore" Version="9.0.4" />
+    <!-- ArchitectureTests -->
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageVersion Include="NetArchTest.Rules" Version="1.3.2" />
+    <PackageVersion Include="Shouldly" Version="4.3.0" />
+    <PackageVersion Include="xunit" Version="2.9.3" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.4" />
+    <PackageVersion Include="coverlet.collector" Version="6.0.4" />
+  </ItemGroup>
+</Project>

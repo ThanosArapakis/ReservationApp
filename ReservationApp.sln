@@ -1,0 +1,60 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36603.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{B0014709-43E1-4AEF-BF42-7B16FF02A46B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReservationApp.core.api", "src\ReservationApp.core.api\ReservationApp.core.api.csproj", "{2BBB236C-44FD-7F0E-6DD7-C993895A20D8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReservationApp.core.api.Application", "src\ReservationApp.core.api.Application\ReservationApp.core.api.Application.csproj", "{704D9235-CE7E-D2F4-00AA-E7644C7871EB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReservationApp.core.api.Infrastructure", "src\ReservationApp.core.api.Infrastructure\ReservationApp.core.api.Infrastructure.csproj", "{3986F3E2-E8E4-0D16-1413-AC546A0B4458}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReservationApp.core.api.Domain", "src\ReservationApp.core.api.Types\ReservationApp.core.api.Domain.csproj", "{244B7A82-1FF1-6C3C-7869-15C4082A791D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReservationTesting", "ReservationTesting\ReservationTesting.csproj", "{5F3C015C-F89B-E320-E0E9-C6199D3797B8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2BBB236C-44FD-7F0E-6DD7-C993895A20D8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2BBB236C-44FD-7F0E-6DD7-C993895A20D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2BBB236C-44FD-7F0E-6DD7-C993895A20D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2BBB236C-44FD-7F0E-6DD7-C993895A20D8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{704D9235-CE7E-D2F4-00AA-E7644C7871EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{704D9235-CE7E-D2F4-00AA-E7644C7871EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{704D9235-CE7E-D2F4-00AA-E7644C7871EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{704D9235-CE7E-D2F4-00AA-E7644C7871EB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3986F3E2-E8E4-0D16-1413-AC546A0B4458}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3986F3E2-E8E4-0D16-1413-AC546A0B4458}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3986F3E2-E8E4-0D16-1413-AC546A0B4458}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3986F3E2-E8E4-0D16-1413-AC546A0B4458}.Release|Any CPU.Build.0 = Release|Any CPU
+		{244B7A82-1FF1-6C3C-7869-15C4082A791D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{244B7A82-1FF1-6C3C-7869-15C4082A791D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{244B7A82-1FF1-6C3C-7869-15C4082A791D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{244B7A82-1FF1-6C3C-7869-15C4082A791D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5F3C015C-F89B-E320-E0E9-C6199D3797B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5F3C015C-F89B-E320-E0E9-C6199D3797B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5F3C015C-F89B-E320-E0E9-C6199D3797B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5F3C015C-F89B-E320-E0E9-C6199D3797B8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{2BBB236C-44FD-7F0E-6DD7-C993895A20D8} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{704D9235-CE7E-D2F4-00AA-E7644C7871EB} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{3986F3E2-E8E4-0D16-1413-AC546A0B4458} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{244B7A82-1FF1-6C3C-7869-15C4082A791D} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{5F3C015C-F89B-E320-E0E9-C6199D3797B8} = {B0014709-43E1-4AEF-BF42-7B16FF02A46B}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4FA63E10-862B-4D37-940D-9A90059B7B25}
+	EndGlobalSection
+EndGlobal
