@@ -17,4 +17,8 @@
     <ProjectReference Include="..\ReservationApp.core.api.Types\ReservationApp.core.api.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="MenuItem\Queries\" />
+  </ItemGroup>
+
 </Project>

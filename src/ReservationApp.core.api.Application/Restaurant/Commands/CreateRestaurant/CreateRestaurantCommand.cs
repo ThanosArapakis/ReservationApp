@@ -1,6 +1,6 @@
 ﻿using ErrorOr;
 using OpenMediator;
-using ReservationApp.core.api.Application.Restaurant.Results;
+using ReservationApp.core.api.Application.Common.Results;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;

@@ -1,5 +1,7 @@
 ﻿using ReservationApp.core.api.Application.Common;
-using ReservationApp.core.api.Application.Restaurant.Commands.CreateMenuItem;
+using ReservationApp.core.api.Application.MenuItem.Commands.CreateMenuItem;
+using ReservationApp.core.api.Application.MenuItem.Commands.UpdateMenuItem;
+using ReservationApp.core.api.Application.MenuItem.Results;
 using ReservationApp.core.api.Application.Restaurant.Commands.CreateRestaurant;
 using ReservationApp.core.api.Application.Restaurant.Commands.UpdateRestaurant;
 using ReservationApp.core.api.Application.Restaurant.Results;
@@ -60,10 +62,10 @@ namespace ReservationApp.core.api.Infrastructure.Common.Util
             new()
             {
                 CategoryId = input.CategoryId,
-                CategoryName = Category.FromValue(input.CategoryId).Description,
+                CategoryName = Category.FromValue(input.CategoryId)!.Description,
                 Name = input.Name,
                 Description = input.Description,
-                Price = input.Price,
+                Price = input.Price.Value,
                 Available = input.Available
             };
     }

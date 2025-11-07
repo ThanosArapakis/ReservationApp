@@ -18,7 +18,7 @@ namespace ReservationApp.core.api.Domain
         public int CategoryId { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
-        public decimal Price { get; set; }
+        public decimal? Price { get; set; }
         public bool Available { get; set; }
 
         // Foreign key to Restaurant

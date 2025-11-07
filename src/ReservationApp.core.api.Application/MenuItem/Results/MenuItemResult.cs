@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ReservationApp.core.api.Application.Restaurant.Results
+namespace ReservationApp.core.api.Application.MenuItem.Results
 {
     public class MenuItemResult
     {

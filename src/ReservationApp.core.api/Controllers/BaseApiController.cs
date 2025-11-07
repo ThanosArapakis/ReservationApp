@@ -4,8 +4,8 @@ using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OpenMediator.Buses;
+using ReservationApp.core.api.Application.Common.Results;
 using ReservationApp.core.api.Application.Common.Util;
-using ReservationApp.core.api.Application.Restaurant.Results;
 
 namespace ReservationApp.core.api.Controllers
 {

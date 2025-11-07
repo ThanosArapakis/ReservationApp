@@ -6,11 +6,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 
-namespace ReservationApp.core.api.Application.Restaurant.Commands.DeleteRestaurant
+namespace ReservationApp.core.api.Application.MenuItem.Commands.DeleteMenuItem
 {
-    public class DeleteRestaurantCommand : ICommand<ErrorOr<DeleteResponse>>
+    public class DeleteMenuItemCommand : ICommand<ErrorOr<DeleteResponse>>
     {
-        public int Id { get; set; }
+        public int ItemId { get; set; }
     }
 }

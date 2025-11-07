@@ -1,6 +1,5 @@
 ﻿using OpenMediator;
 using ReservationApp.core.api.Application.Common.Interfaces.Restaurant;
-using ReservationApp.core.api.Application.Restaurant.Results;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ErrorOr;
 using ReservationApp.core.api.Application.Restaurant.Commands.UpdateRestaurant;
+using ReservationApp.core.api.Application.Common.Results;
 
 namespace ReservationApp.core.api.Application.Restaurant.Commands.CreateRestaurant
 {

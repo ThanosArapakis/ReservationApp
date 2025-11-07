@@ -1,6 +1,6 @@
 ﻿using ErrorOr;
 using OpenMediator;
-using ReservationApp.core.api.Application.Restaurant.Results;
+using ReservationApp.core.api.Application.Common.Results;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ReservationApp.core.api.Application.Restaurant.Commands.CreateMenuItem
+namespace ReservationApp.core.api.Application.MenuItem.Commands.CreateMenuItem
 {
     public class CreateMenuItemCommand : ICommand<ErrorOr<PostResponse>>
     {

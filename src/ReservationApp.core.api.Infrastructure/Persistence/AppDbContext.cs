@@ -14,9 +14,9 @@ namespace ReservationApp.core.api.Infrastructure.Persistence
         {
         }
 
-        public DbSet<Restaurant> Restaurants { get; set; }
+        public virtual DbSet<Restaurant> Restaurants { get; set; }
 
-        public DbSet<MenuItem> MenuItems { get; set; }
+        public virtual DbSet<MenuItem> MenuItems { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

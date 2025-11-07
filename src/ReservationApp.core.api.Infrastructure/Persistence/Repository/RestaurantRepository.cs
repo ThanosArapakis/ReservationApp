@@ -2,7 +2,7 @@
 using ErrorOr;
 using Microsoft.EntityFrameworkCore;
 using ReservationApp.core.api.Application.Common.Interfaces.Restaurant;
-using ReservationApp.core.api.Application.Restaurant.Commands.CreateMenuItem;
+using ReservationApp.core.api.Application.Common.Results;
 using ReservationApp.core.api.Application.Restaurant.Commands.CreateRestaurant;
 using ReservationApp.core.api.Application.Restaurant.Commands.DeleteRestaurant;
 using ReservationApp.core.api.Application.Restaurant.Commands.UpdateRestaurant;
@@ -47,7 +47,7 @@ namespace ReservationApp.core.api.Infrastructure.Persistence.Repository
         {
             try
             {
-                List<Restaurant> result = _db.Restaurants.Include(r => r.MenuItems).ToList();
+                List<Restaurant> result = _db.Restaurants.Include(r => r.MenuItems.Where(mi => mi.Available)).ToList();
                 return result.ConvertAll(RepoMapper.ToRestaurantResult);
             }
             catch (Exception ex)
@@ -80,29 +80,13 @@ namespace ReservationApp.core.api.Infrastructure.Persistence.Repository
             }
         }
 
-        public async Task<ErrorOr<PostResponse>> CreateMenuItem(CreateMenuItemCommand command)
-        {
-            MenuItem menuItem = command.ToMenuItem();
-
-            bool exists = _db.Restaurants.Any(r => r.Id == command.RestaurantId);               
-            if (exists)
-            {
-                _db.MenuItems.Add(menuItem);
-                await _db.SaveChangesAsync();
-
-                return new PostResponse(menuItem.RestaurantId);
-            }
-            else return Error.NotFound("NotFound", "Restaurant not found");
-        }
-
-
         public async Task<ErrorOr<DeleteResponse>> DeleteRestaurant(DeleteRestaurantCommand command)
         {
             Restaurant? restaurant = GetById(command.Id);
             if (restaurant == null) return Error.NotFound("NotFound", "Restaurant not found");
             try
             {
-                var result = _db.Remove(restaurant);
+                _db.Restaurants.Remove(restaurant);
                 await _db.SaveChangesAsync();
                 return new DeleteResponse(true);
             }
@@ -112,10 +96,10 @@ namespace ReservationApp.core.api.Infrastructure.Persistence.Repository
             }
         }
 
-        public Task<ErrorOr<PostResponse>> UpdateRestaurantAsync(UpdateRestaurantCommand command)
+        public async Task<ErrorOr<PostResponse>> UpdateRestaurantAsync(UpdateRestaurantCommand command)
         {
             Restaurant? restaurant = GetById(command.Id);
-            if (restaurant == null) return Task.FromResult<ErrorOr<PostResponse>>(Error.NotFound("NotFound", "Restaurant not found"));
+            if (restaurant == null) return Error.NotFound("NotFound", "Restaurant not found");
             try
             {
                 restaurant.Name = command.Name;
@@ -126,12 +110,12 @@ namespace ReservationApp.core.api.Infrastructure.Persistence.Repository
 
 
                 _db.Restaurants.Update(restaurant);
-                _db.SaveChanges();
-                return Task.FromResult<ErrorOr<PostResponse>>(new PostResponse(restaurant.Id));
+                await _db.SaveChangesAsync();
+                return new PostResponse(restaurant.Id);
             }
             catch (Exception ex)
             {
-                return Task.FromResult<ErrorOr<PostResponse>>(Error.Failure("Database Exception", ex.Message + ": " + ex.InnerException?.Message));
+                return Error.Failure("Database Exception", ex.Message + ": " + ex.InnerException?.Message);
             }
 
         }
@@ -140,7 +124,7 @@ namespace ReservationApp.core.api.Infrastructure.Persistence.Repository
         {
             return _db.Restaurants
                 .AsNoTracking()
-                .Include(r => r.MenuItems)
+                .Include(r => r.MenuItems.Where(mi => mi.Available))
                 .FirstOrDefault(r => r.Id == id);
         }
 
@@ -149,7 +133,7 @@ namespace ReservationApp.core.api.Infrastructure.Persistence.Repository
             Restaurant? result = new Restaurant();
             IQueryable<Restaurant> queryable = _db.Restaurants
                         .AsNoTracking()
-                        .Include(r => r.MenuItems);
+                        .Include(r => r.MenuItems.Where(mi => mi.Available));
             foreach (var filter in filters)
             {
                 queryable = queryable.Where(filter);
