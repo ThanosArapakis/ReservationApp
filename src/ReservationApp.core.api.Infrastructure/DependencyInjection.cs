@@ -32,6 +32,7 @@ namespace ReservationApp.core.api.Infrastructure
         {
             services.AddScoped<IRestaurantRepository, RestaurantRepository>();
             services.AddScoped<IMenuItemRepository, MenuItemRepository>();
+            services.AddScoped<IReservationRepository, ReservationRepository>();
             return services;
         }
 

@@ -26,5 +26,11 @@ namespace ReservationApp.core.api.Domain
 
         [ForeignKey("RestaurantId")]
         public Restaurant Restaurant { get; set; }
+
+        // Foreign key to Reservation
+        public int? ReservationId { get; set; }
+
+        [ForeignKey("ReservationId")]
+        public Reservation Reservation { get; set; }
     }
 }
