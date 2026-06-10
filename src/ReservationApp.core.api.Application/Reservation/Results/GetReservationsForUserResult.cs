@@ -7,11 +7,18 @@ using System.Threading.Tasks;
 
 namespace ReservationApp.core.api.Application.Reservation.Results
 {
-    public record CreateReservationResult(
+    public record GetReservationsForUserResult
+    (
+        int ReservationId,
         int RestaurantId,
+        string RestaurantName,
+        string RestaurantAddress,
+        string UserID,
         string Name,
+        string UserEmail,
         int? NumberOfGuests,
         DateTime? ReservationDate,
-        int? ReservationStatus
+        string? ReservationStatus,
+        List<MenuItemResult> MenuItems
     );
 }

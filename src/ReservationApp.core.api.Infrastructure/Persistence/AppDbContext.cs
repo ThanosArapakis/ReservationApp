@@ -20,25 +20,28 @@ namespace ReservationApp.core.api.Infrastructure.Persistence
 
         public virtual DbSet<Reservation> Reservations { get; set; }
 
+        public virtual DbSet<ReservationMenuItem> ReservationMenuItems { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Restaurant>()
-            .HasMany(r => r.MenuItems)      // κάθε MenuItem έχει ένα Restaurant
-            .WithOne(mi => mi.Restaurant)       // κάθε Restaurant έχει πολλά MenuItems
-            .HasForeignKey(mi => mi.RestaurantId)  // FK property
-            .OnDelete(DeleteBehavior.Cascade);     // αν σβήσεις Restaurant, σβήνονται και τα MenuItems
-
-            //modelBuilder.Entity<Reservation>()
-            //.HasOne(res => res.Restaurant)
-            //.WithMany()
-            //.HasForeignKey(res => res.RestaurantId)
-            //.OnDelete(DeleteBehavior.SetNull);
-
-            modelBuilder.Entity<Reservation>()
             .HasMany(r => r.MenuItems)
-            .WithOne(mi => mi.Reservation)
-            .HasForeignKey(res => res.ReservationId)
-            .OnDelete(DeleteBehavior.SetNull);
+            .WithOne(mi => mi.Restaurant)
+            .HasForeignKey(mi => mi.RestaurantId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<ReservationMenuItem>()
+                .HasKey(rm => new { rm.ReservationId, rm.MenuItemId });
+
+            modelBuilder.Entity<ReservationMenuItem>()
+                .HasOne(rm => rm.Reservation)
+                .WithMany(r => r.ReservationMenuItems)
+                .HasForeignKey(rm => rm.ReservationId);
+
+            modelBuilder.Entity<ReservationMenuItem>()
+                .HasOne(rm => rm.MenuItem)
+                .WithMany(mi => mi.ReservationMenuItems)
+                .HasForeignKey(rm => rm.MenuItemId);
         }
     }
 }

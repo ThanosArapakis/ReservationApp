@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ReservationApp.core.api.Application.MenuItem.Results
 {
-    public class MenuItemResult
+    public record MenuItemResult
     {
         public int CategoryId { get; set; }
         public string CategoryName { get; set; }
