@@ -24,7 +24,7 @@ namespace ReservationApp.core.api.Infrastructure.Persistence.Repository
         {
             MenuItem menuItem = command.ToMenuItem();
 
-            bool exists = _db.Restaurants.Any(r => r.Id == command.RestaurantId);
+            bool exists = await _db.Restaurants.AnyAsync(r => r.Id == command.RestaurantId);
             if(command.CategoryId > 2) return Error.Validation("Invalid Category", "Category has to be 0 - 2");
             if (exists)
             {
@@ -58,8 +58,8 @@ namespace ReservationApp.core.api.Infrastructure.Persistence.Repository
 
         public async Task<ErrorOr<PostResponse>> UpdateMenuItemAsync(UpdateMenuItemCommand command)
         {
-            bool connected = _db.Restaurants.Any(r => r.Id == command.RestaurantId);
-            bool exists = _db.MenuItems.Any(mi => mi.ItemId == command.ItemId);
+            bool connected = await _db.Restaurants.AnyAsync(r => r.Id == command.RestaurantId);
+            bool exists = await _db.MenuItems.AnyAsync(mi => mi.ItemId == command.ItemId);
 
             if (command.CategoryId > 2) return Error.Validation("Invalid Category", "Category has to be 0 - 2");
             if (exists && connected)

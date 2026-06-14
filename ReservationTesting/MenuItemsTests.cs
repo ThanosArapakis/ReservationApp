@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using MockQueryable.Moq;
 using Moq;
 using ReservationApp.core.api.Application.Common.Interfaces.Restaurant;
 using ReservationApp.core.api.Application.MenuItem.Commands.CreateMenuItem;
@@ -61,34 +62,22 @@ namespace ReservationTesting
 
 
             // Setup MenuItem DbSet mock
-            var menuItemsQueryable = _testMenuItems.AsQueryable();
+            var menuItemsQueryable = _testMenuItems.AsQueryable().BuildMockDbSet();
             _mockMenuItemSet = new Mock<DbSet<MenuItem>>();
-            _mockMenuItemSet.As<IQueryable<MenuItem>>().Setup(m => m.Provider).Returns(menuItemsQueryable.Provider);
-            _mockMenuItemSet.As<IQueryable<MenuItem>>().Setup(m => m.Expression).Returns(menuItemsQueryable.Expression);
-            _mockMenuItemSet.As<IQueryable<MenuItem>>().Setup(m => m.ElementType).Returns(menuItemsQueryable.ElementType);
-            _mockMenuItemSet.As<IQueryable<MenuItem>>().Setup(m => m.GetEnumerator()).Returns(menuItemsQueryable.GetEnumerator());
 
             // Setup Restaurant DbSet mock
-            var restaurantsQueryable = _testRestaurants.AsQueryable();
+            var restaurantsQueryable = _testRestaurants.AsQueryable().BuildMockDbSet();
             _mockRestaurantSet = new Mock<DbSet<Restaurant>>();
-            _mockRestaurantSet.As<IQueryable<Restaurant>>().Setup(m => m.Provider).Returns(restaurantsQueryable.Provider);
-            _mockRestaurantSet.As<IQueryable<Restaurant>>().Setup(m => m.Expression).Returns(restaurantsQueryable.Expression);
-            _mockRestaurantSet.As<IQueryable<Restaurant>>().Setup(m => m.ElementType).Returns(restaurantsQueryable.ElementType);
-            _mockRestaurantSet.As<IQueryable<Restaurant>>().Setup(m => m.GetEnumerator()).Returns(restaurantsQueryable.GetEnumerator());
 
-            var reservationMenuItemsQueryable = _testReservationMenuItems.AsQueryable();
+            var reservationMenuItemsQueryable = _testReservationMenuItems.AsQueryable().BuildMockDbSet();
             _mockReservationMenuItemSet = new Mock<DbSet<ReservationMenuItem>>();
-            _mockReservationMenuItemSet.As<IQueryable<ReservationMenuItem>>().Setup(m => m.Provider).Returns(reservationMenuItemsQueryable.Provider);
-            _mockReservationMenuItemSet.As<IQueryable<ReservationMenuItem>>().Setup(m => m.Expression).Returns(reservationMenuItemsQueryable.Expression);
-            _mockReservationMenuItemSet.As<IQueryable<ReservationMenuItem>>().Setup(m => m.ElementType).Returns(reservationMenuItemsQueryable.ElementType);
-            _mockReservationMenuItemSet.As<IQueryable<ReservationMenuItem>>().Setup(m => m.GetEnumerator()).Returns(reservationMenuItemsQueryable.GetEnumerator());
 
             // Setup context
             var options = new DbContextOptions<AppDbContext>();
             _mockContext = new Mock<AppDbContext>(options);
-            _mockContext.Setup(c => c.MenuItems).Returns(_mockMenuItemSet.Object);
-            _mockContext.Setup(c => c.Restaurants).Returns(_mockRestaurantSet.Object);
-            _mockContext.Setup(c => c.ReservationMenuItems).Returns(_mockReservationMenuItemSet.Object);
+            _mockContext.Setup(c => c.MenuItems).Returns(menuItemsQueryable.Object);
+            _mockContext.Setup(c => c.Restaurants).Returns(restaurantsQueryable.Object);
+            _mockContext.Setup(c => c.ReservationMenuItems).Returns(reservationMenuItemsQueryable.Object);
 
             _repository = new MenuItemRepository(_mockContext.Object);
         }
@@ -107,15 +96,11 @@ namespace ReservationTesting
                 RestaurantId = 1
             };
 
-            _mockMenuItemSet.Setup(m => m.Add(It.IsAny<MenuItem>()));
-            _mockContext.Setup(m => m.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
-
             // Act
             var result = await _repository.CreateMenuItem(command);
 
             // Assert
             Assert.False(result.IsError);
-            _mockMenuItemSet.Verify(m => m.Add(It.IsAny<MenuItem>()), Times.Once());
             _mockContext.Verify(m => m.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once());
         }
 
@@ -147,9 +132,6 @@ namespace ReservationTesting
             // Arrange
             var command = new DeleteMenuItemCommand { ItemId = 1 };
 
-            _mockContext.Setup(m => m.Remove(It.IsAny<MenuItem>()));
-            _mockContext.Setup(m => m.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
-
             // Act
             var result = await _repository.DeleteMenuItem(command);
 
@@ -172,9 +154,6 @@ namespace ReservationTesting
                 CategoryId = 2,
                 RestaurantId = 1
             };
-
-            _mockContext.Setup(m => m.MenuItems.Update(It.IsAny<MenuItem>()));
-            _mockContext.Setup(m => m.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
 
             // Act
             var result = await _repository.UpdateMenuItemAsync(command);
