@@ -1,6 +1,7 @@
 ﻿using Azure;
 using ErrorOr;
 using Microsoft.EntityFrameworkCore;
+using ReservationApp.core.api.Application.Common;
 using ReservationApp.core.api.Application.Common.Interfaces.Restaurant;
 using ReservationApp.core.api.Application.Common.Results;
 using ReservationApp.core.api.Application.MenuItem.Results;
@@ -30,7 +31,11 @@ namespace ReservationApp.core.api.Infrastructure.Persistence.Repository
                 Reservation reservation = command.ToReservation();
                 ErrorOr<bool> validation = ReservationValidator.Validate(reservation, _db);
                 if (validation.IsError) return validation.Errors;
-                 
+
+                //Check capacity for the reservation
+                if(!await _restaurantRepo.CheckCapacity(reservation.RestaurantId, reservation.NumberOfGuests.Value, reservation.ReservationDate.Value)) 
+                    return CustomErrors.RestaurantCapacityExceeded;
+
                 _db.Reservations.Add(reservation);
 
                 //Add the menu items connected to the Reservation
@@ -39,12 +44,12 @@ namespace ReservationApp.core.api.Infrastructure.Persistence.Repository
                     MenuItemId = mi.ItemId,
                     Reservation = reservation // reference to the newly created reservation
                 }).ToArray();
-
                 _db.ReservationMenuItems.AddRange(reservationMenuItems);
-                _db.SaveChanges();
 
-                //adjust the capacity of the restaurant
-                await _restaurantRepo.ReduceCapacity(reservation.RestaurantId.Value, reservation.NumberOfGuests.Value);
+                //Adjust the restaurant capacity after the reservation
+                await _restaurantRepo.ReduceCapacity(reservation.RestaurantId, reservation.NumberOfGuests.Value, reservation.ReservationDate.Value);
+
+                await _db.SaveChangesAsync();
 
                 CreateReservationResult result = reservation.ToReservationResult();
                 return result;

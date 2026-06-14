@@ -15,5 +15,8 @@ namespace ReservationApp.core.api.Domain
         public string PhoneNumber { get; set; }
         public int Capacity { get; set; }
         public List<MenuItem> MenuItems { get; set; }
+        public List<Reservation> Reservations { get; set; } = new();
+        public List<RestaurantDailyCapacity> DailyCapacities { get; set; } = new();
+
     }
 }

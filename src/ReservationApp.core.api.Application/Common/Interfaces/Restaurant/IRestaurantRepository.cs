@@ -23,8 +23,8 @@ namespace ReservationApp.core.api.Application.Common.Interfaces.Restaurant
         Task<ErrorOr<List<RestaurantResult>>> GetAllRestaurants();
         Task<ErrorOr<DeleteResponse>> DeleteRestaurant(DeleteRestaurantCommand command);
         Task<ErrorOr<PostResponse>> UpdateRestaurantAsync(UpdateRestaurantCommand command);
-
-        Task ReduceCapacity(int restaurantId, int numberOfGuests);
+        Task<bool> CheckCapacity(int restaurantId, int numberOfGuests, DateTime reservationDate);
+        Task ReduceCapacity(int restaurantId, int numberOfGuests, DateTime reservationDate);
 
     }
 }

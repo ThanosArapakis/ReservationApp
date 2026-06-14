@@ -43,6 +43,7 @@ namespace ReservationApp.core.api.Infrastructure.Common.Util
             // Check for duplicate reservations at the same restaurant and date/time
             if (_db.Reservations.Any(r => 
                 r.RestaurantId == reservation.RestaurantId && 
+                r.UserId == reservation.UserId &&
                 r.ReservationDate == reservation.ReservationDate))
                 return CustomErrors.DuplicateReservation;
 

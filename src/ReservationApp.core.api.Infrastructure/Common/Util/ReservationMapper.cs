@@ -29,7 +29,7 @@ namespace ReservationApp.core.api.Infrastructure.Common.Util
         internal static GetReservationsForUserResult ToGetReservationResult (this Reservation reservation) =>
             new(
                 reservation.Id,
-                reservation.RestaurantId.Value,
+                reservation.RestaurantId,
                 reservation.Restaurant?.Name ?? string.Empty,
                 reservation.Restaurant?.Address ?? string.Empty,
                 reservation.UserId ?? string.Empty,
@@ -43,7 +43,7 @@ namespace ReservationApp.core.api.Infrastructure.Common.Util
 
         internal static CreateReservationResult ToReservationResult(this Reservation reservation) =>
             new(
-                reservation.RestaurantId.Value,
+                reservation.RestaurantId,
                 reservation.UserId ?? string.Empty,
                 reservation.NumberOfGuests,
                 reservation.ReservationDate,

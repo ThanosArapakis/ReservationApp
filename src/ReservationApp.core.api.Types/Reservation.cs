@@ -11,12 +11,13 @@ namespace ReservationApp.core.api.Domain
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public int? RestaurantId { get; set; }
-        public Restaurant? Restaurant { get; set; }
-        public string? UserId { get; set; }
+        public int RestaurantId { get; set; }
+        public Restaurant Restaurant { get; set; }
+        public string UserId { get; set; }
         public string? UserEmail { get; set; }
         public string? UserPhone { get; set; }
         public int? NumberOfGuests { get; set; }
+        public int Status { get; set; } = 0; // Default to Pending
         public DateTime? ReservationDate { get; set; }
         public List<ReservationMenuItem> ReservationMenuItems { get; set; } = new List<ReservationMenuItem>();
     }

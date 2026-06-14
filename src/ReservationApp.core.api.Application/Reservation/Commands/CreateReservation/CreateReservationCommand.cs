@@ -15,7 +15,7 @@ namespace ReservationApp.core.api.Application.Reservation.Commands.CreateReserva
     public class CreateReservationCommand : ICommand<ErrorOr<CreateReservationResult>> 
     {
         //Restaurant
-        public int? RestaurantId { get; set; }
+        public int RestaurantId { get; set; }
 
         //User Info
         public string? UserId { get; set; }
@@ -24,7 +24,7 @@ namespace ReservationApp.core.api.Application.Reservation.Commands.CreateReserva
         public string? UserPhone { get; set; } = null;
 
         public int? NumberOfGuests { get; set; }
-        public DateTime? ReservationDate { get; set; }
+        public DateTime ReservationDate { get; set; }
         public List<MenuItemDTO> MenuItems { get; set; } = new List<MenuItemDTO>();
 
     }

@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using ErrorOr;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using ReservationApp.core.api.Application.Common;
 using ReservationApp.core.api.Application.Common.Interfaces.Restaurant;
 using ReservationApp.core.api.Application.Common.Results;
 using ReservationApp.core.api.Application.Restaurant.Commands.CreateRestaurant;
@@ -19,7 +21,7 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace ReservationApp.core.api.Infrastructure.Persistence.Repository
 {
-    public class RestaurantRepository(AppDbContext _db) : IRestaurantRepository
+    public class RestaurantRepository(AppDbContext _db, ILogger<RestaurantRepository> _logger) : IRestaurantRepository
     {
 
         public async Task<ErrorOr<RestaurantResult>> GetRestaurant(GetRestaurantsQuery query, List<Expression<Func<Domain.Restaurant, bool>>> filters)
@@ -69,6 +71,9 @@ namespace ReservationApp.core.api.Infrastructure.Persistence.Repository
                     _db.Restaurants.Add(restaurant);
                     await _db.SaveChangesAsync();
 
+                    ErrorOr<bool> capacityInit = await InitalizeDailyCapacityAsync(restaurant.Id);
+                    if (capacityInit.IsError) _logger.LogError("Failed to initialize daily capacity for restaurant {RestaurantId}: {Error}", restaurant.Id, capacityInit.Errors);
+                    
                     return new PostResponse(restaurant.Id);
                 }
                 else return validate.Errors;        
@@ -86,6 +91,16 @@ namespace ReservationApp.core.api.Infrastructure.Persistence.Repository
             if (restaurant == null) return Error.NotFound("NotFound", "Restaurant not found");
             try
             {
+                // MenuItem -> ReservationMenuItem is NoAction, so clear those lines first.
+                // The DB then cascades: Restaurant -> MenuItems, Reservations (-> their lines)
+                // and RestaurantDailyCapacity.
+                var menuItemIds = _db.MenuItems
+                    .Where(mi => mi.RestaurantId == command.Id)
+                    .Select(mi => mi.ItemId);
+                var lines = _db.ReservationMenuItems
+                    .Where(rmi => menuItemIds.Contains(rmi.MenuItemId));
+                _db.ReservationMenuItems.RemoveRange(lines);
+
                 _db.Restaurants.Remove(restaurant);
                 await _db.SaveChangesAsync();
                 return new DeleteResponse(true);
@@ -120,14 +135,55 @@ namespace ReservationApp.core.api.Infrastructure.Persistence.Repository
 
         }
 
-        public async Task ReduceCapacity(int restaurantId, int numberOfGuests)
+        private async Task<ErrorOr<bool>> InitalizeDailyCapacityAsync(int restaurantId)
         {
             Restaurant? restaurant = GetById(restaurantId);
-            if (restaurant != null)
+            if (restaurant == null) return Error.NotFound("NotFound", "Restaurant not found");
+            try
             {
-                restaurant.Capacity -= numberOfGuests;
-                _db.Restaurants.Update(restaurant);
+                for (int i = 0; i < Const.CapacityInit; i++)
+                {
+                    DateTime date = DateTime.Now.Date.AddDays(i);
+                    RestaurantDailyCapacity? dailyCapacity = _db.RestaurantDailyCapacity.FirstOrDefault(rdc => rdc.RestaurantId == restaurantId && rdc.Date.Date == date);
+                    if (dailyCapacity == null)
+                    {
+                        dailyCapacity = new RestaurantDailyCapacity
+                        {
+                            RestaurantId = restaurantId,
+                            Date = date,
+                            Capacity = restaurant.Capacity
+                        };
+                        _db.RestaurantDailyCapacity.Add(dailyCapacity);
+                    }
+                }
                 await _db.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return Error.Failure("Database Exception", ex.Message + ": " + ex.InnerException?.Message);
+            }
+        }
+
+        public async Task<bool> CheckCapacity(int restaurantId, int numberOfGuests, DateTime reservationDate)
+        {
+            Restaurant? restaurant = GetById(restaurantId);
+            RestaurantDailyCapacity? dailyCapacity = _db.RestaurantDailyCapacity.FirstOrDefault(rdc => rdc.RestaurantId == restaurantId && rdc.Date.Date == reservationDate.Date);
+            
+            if (dailyCapacity != null) return dailyCapacity.Capacity >= numberOfGuests;
+
+            return false;
+        }
+
+        public async Task ReduceCapacity(int restaurantId, int numberOfGuests, DateTime reservationDate)
+        {
+            Restaurant? restaurant = GetById(restaurantId);
+            RestaurantDailyCapacity? dailyCapacity = _db.RestaurantDailyCapacity.FirstOrDefault(rdc => rdc.RestaurantId == restaurantId && rdc.Date.Date == reservationDate.Date);
+
+            if (dailyCapacity != null)
+            {
+                dailyCapacity.Capacity -= numberOfGuests;
+                _db.RestaurantDailyCapacity.Update(dailyCapacity);
             }
         }
 

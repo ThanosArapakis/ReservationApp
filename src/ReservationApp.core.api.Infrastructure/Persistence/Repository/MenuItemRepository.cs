@@ -42,6 +42,10 @@ namespace ReservationApp.core.api.Infrastructure.Persistence.Repository
             if (menuItem == null) return Error.NotFound("NotFound", "MenuItem not found");
             try
             {
+                // MenuItem -> ReservationMenuItem is NoAction, so clear the lines first
+                var lines = _db.ReservationMenuItems.Where(rmi => rmi.MenuItemId == command.ItemId);
+                _db.ReservationMenuItems.RemoveRange(lines);
+
                 _db.MenuItems.Remove(menuItem);
                 await _db.SaveChangesAsync();
                 return new DeleteResponse(true);

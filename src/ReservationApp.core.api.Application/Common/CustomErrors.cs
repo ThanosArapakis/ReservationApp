@@ -16,7 +16,7 @@ namespace ReservationApp.core.api.Application.Common
 
         public static Error InvalidReservationDate => Error.Validation(
             code: "Reservation.InvalidDate",
-            description: "Reservation date must be in the future.");
+            description: "Reservation date must not be null and has to be in the future.");
 
         public static Error InvalidNumberOfGuests => Error.Validation(
             code: "Reservation.InvalidGuests",

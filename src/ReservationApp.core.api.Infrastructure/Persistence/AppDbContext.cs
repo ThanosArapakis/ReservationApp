@@ -22,6 +22,8 @@ namespace ReservationApp.core.api.Infrastructure.Persistence
 
         public virtual DbSet<ReservationMenuItem> ReservationMenuItems { get; set; }
 
+        public virtual DbSet<RestaurantDailyCapacity> RestaurantDailyCapacity { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Restaurant>()
@@ -30,18 +32,36 @@ namespace ReservationApp.core.api.Infrastructure.Persistence
             .HasForeignKey(mi => mi.RestaurantId)
             .OnDelete(DeleteBehavior.Cascade);
 
+            modelBuilder.Entity<Restaurant>()
+            .HasMany(r => r.Reservations)
+            .WithOne(r => r.Restaurant)
+            .HasForeignKey(r => r.RestaurantId)
+            .OnDelete(DeleteBehavior.Cascade);
+
             modelBuilder.Entity<ReservationMenuItem>()
                 .HasKey(rm => new { rm.ReservationId, rm.MenuItemId });
 
             modelBuilder.Entity<ReservationMenuItem>()
                 .HasOne(rm => rm.Reservation)
                 .WithMany(r => r.ReservationMenuItems)
-                .HasForeignKey(rm => rm.ReservationId);
+                .HasForeignKey(rm => rm.ReservationId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<ReservationMenuItem>()
                 .HasOne(rm => rm.MenuItem)
                 .WithMany(mi => mi.ReservationMenuItems)
-                .HasForeignKey(rm => rm.MenuItemId);
+                .HasForeignKey(rm => rm.MenuItemId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+
+            modelBuilder.Entity<RestaurantDailyCapacity>()
+                .HasKey(rdc => new { rdc.RestaurantId, rdc.Date });
+
+            modelBuilder.Entity<Restaurant>()
+            .HasMany(r => r.DailyCapacities)
+            .WithOne(rdc => rdc.Restaurant)
+            .HasForeignKey(rdc => rdc.RestaurantId)
+            .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

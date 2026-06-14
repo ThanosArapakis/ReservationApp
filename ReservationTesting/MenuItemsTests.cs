@@ -15,8 +15,10 @@ namespace ReservationTesting
     {
         private readonly List<MenuItem> _testMenuItems;
         private readonly List<Restaurant> _testRestaurants;
+        private readonly List<ReservationMenuItem> _testReservationMenuItems;
         private readonly Mock<DbSet<MenuItem>> _mockMenuItemSet;
         private readonly Mock<DbSet<Restaurant>> _mockRestaurantSet;
+        private readonly Mock<DbSet<ReservationMenuItem>> _mockReservationMenuItemSet;
         private readonly Mock<AppDbContext> _mockContext;
         private readonly IMenuItemRepository _repository;
 
@@ -50,6 +52,14 @@ namespace ReservationTesting
                 }
             };
 
+            _testReservationMenuItems = new List<ReservationMenuItem>
+            {
+                new ReservationMenuItem { MenuItemId = 1, ReservationId = 1, Quantity = 2 },
+                new ReservationMenuItem { MenuItemId = 2, ReservationId = 1 }
+            };
+
+
+
             // Setup MenuItem DbSet mock
             var menuItemsQueryable = _testMenuItems.AsQueryable();
             _mockMenuItemSet = new Mock<DbSet<MenuItem>>();
@@ -66,11 +76,19 @@ namespace ReservationTesting
             _mockRestaurantSet.As<IQueryable<Restaurant>>().Setup(m => m.ElementType).Returns(restaurantsQueryable.ElementType);
             _mockRestaurantSet.As<IQueryable<Restaurant>>().Setup(m => m.GetEnumerator()).Returns(restaurantsQueryable.GetEnumerator());
 
+            var reservationMenuItemsQueryable = _testReservationMenuItems.AsQueryable();
+            _mockReservationMenuItemSet = new Mock<DbSet<ReservationMenuItem>>();
+            _mockReservationMenuItemSet.As<IQueryable<ReservationMenuItem>>().Setup(m => m.Provider).Returns(reservationMenuItemsQueryable.Provider);
+            _mockReservationMenuItemSet.As<IQueryable<ReservationMenuItem>>().Setup(m => m.Expression).Returns(reservationMenuItemsQueryable.Expression);
+            _mockReservationMenuItemSet.As<IQueryable<ReservationMenuItem>>().Setup(m => m.ElementType).Returns(reservationMenuItemsQueryable.ElementType);
+            _mockReservationMenuItemSet.As<IQueryable<ReservationMenuItem>>().Setup(m => m.GetEnumerator()).Returns(reservationMenuItemsQueryable.GetEnumerator());
+
             // Setup context
             var options = new DbContextOptions<AppDbContext>();
             _mockContext = new Mock<AppDbContext>(options);
             _mockContext.Setup(c => c.MenuItems).Returns(_mockMenuItemSet.Object);
             _mockContext.Setup(c => c.Restaurants).Returns(_mockRestaurantSet.Object);
+            _mockContext.Setup(c => c.ReservationMenuItems).Returns(_mockReservationMenuItemSet.Object);
 
             _repository = new MenuItemRepository(_mockContext.Object);
         }
