@@ -20,6 +20,7 @@ using ReservationApp.core.api.Application.Common.Interfaces.Restaurant;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.Logging;
 using ReservationApp.core.api.Application.Common;
+using MockQueryable.Moq;
 
 namespace ReservationTesting
 {
@@ -46,13 +47,7 @@ namespace ReservationTesting
                 MenuItems = new List<MenuItem>{ new MenuItem { ItemId = 3, Name = "Item 3", Available = true, Price = 12.99m } } },
             };
 
-            var queryableData = _testData.AsQueryable();
-
-            _mockSet = new Mock<DbSet<Restaurant>>();
-            _mockSet.As<IQueryable<Restaurant>>().Setup(m => m.Provider).Returns(queryableData.Provider);
-            _mockSet.As<IQueryable<Restaurant>>().Setup(m => m.Expression).Returns(queryableData.Expression);
-            _mockSet.As<IQueryable<Restaurant>>().Setup(m => m.ElementType).Returns(queryableData.ElementType);
-            _mockSet.As<IQueryable<Restaurant>>().Setup(m => m.GetEnumerator()).Returns(queryableData.GetEnumerator());
+            _mockSet = _testData.AsQueryable().BuildMockDbSet();
 
             var options = new DbContextOptions<AppDbContext>();
             _mockContext = new Mock<AppDbContext>(options);
@@ -129,22 +124,11 @@ namespace ReservationTesting
                 new ReservationMenuItem { ReservationId = 2, MenuItemId = menuItemIds[1], Quantity = 1 }
             };
 
-            // Setup MenuItems DbSet mock for querying
-            var testMenuItems = restaurantToDelete.MenuItems.ToList();
-            var menuItemsQueryable = testMenuItems.AsQueryable();
-            var mockMenuItemSet = new Mock<DbSet<MenuItem>>();
-            mockMenuItemSet.As<IQueryable<MenuItem>>().Setup(m => m.Provider).Returns(menuItemsQueryable.Provider);
-            mockMenuItemSet.As<IQueryable<MenuItem>>().Setup(m => m.Expression).Returns(menuItemsQueryable.Expression);
-            mockMenuItemSet.As<IQueryable<MenuItem>>().Setup(m => m.ElementType).Returns(menuItemsQueryable.ElementType);
-            mockMenuItemSet.As<IQueryable<MenuItem>>().Setup(m => m.GetEnumerator()).Returns(menuItemsQueryable.GetEnumerator());
+            // Setup MenuItems DbSet mock using MockQueryable
+            var mockMenuItemSet = restaurantToDelete.MenuItems.AsQueryable().BuildMockDbSet();
 
-            // Setup ReservationMenuItems DbSet mock
-            var reservationMenuItemsQueryable = testReservationMenuItems.AsQueryable();
-            var mockReservationMenuItemSet = new Mock<DbSet<ReservationMenuItem>>();
-            mockReservationMenuItemSet.As<IQueryable<ReservationMenuItem>>().Setup(m => m.Provider).Returns(reservationMenuItemsQueryable.Provider);
-            mockReservationMenuItemSet.As<IQueryable<ReservationMenuItem>>().Setup(m => m.Expression).Returns(reservationMenuItemsQueryable.Expression);
-            mockReservationMenuItemSet.As<IQueryable<ReservationMenuItem>>().Setup(m => m.ElementType).Returns(reservationMenuItemsQueryable.ElementType);
-            mockReservationMenuItemSet.As<IQueryable<ReservationMenuItem>>().Setup(m => m.GetEnumerator()).Returns(reservationMenuItemsQueryable.GetEnumerator());
+            // Setup ReservationMenuItems DbSet mock using MockQueryable
+            var mockReservationMenuItemSet = testReservationMenuItems.AsQueryable().BuildMockDbSet();
 
             // Setup context mocks
             _mockContext.Setup(c => c.MenuItems).Returns(mockMenuItemSet.Object);
