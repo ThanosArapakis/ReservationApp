@@ -12,6 +12,6 @@ namespace ReservationApp.core.api.Application.Reservation.Results
         string Name,
         int? NumberOfGuests,
         DateTime? ReservationDate,
-        int? ReservationStatus
+        string ReservationStatus
     );
 }

@@ -20,7 +20,8 @@ namespace ReservationApp.core.api.Controllers
 {
     [Route("restaurant")]
     [ApiController]
-    public class RestaurantApiController(IMediatorBus _mediator, ILogger<RestaurantApiController> _logger) : BaseApiController<RestaurantApiController>(_logger)
+    [Tags("Restaurants")]
+    public partial class RestaurantApiController(IMediatorBus _mediator, ILogger<RestaurantApiController> _logger) : BaseApiController<RestaurantApiController>(_logger)
     {
         #region Restaurant Endpoints
 
@@ -55,29 +56,6 @@ namespace ReservationApp.core.api.Controllers
         {
             DeleteRestaurantCommand command = new DeleteRestaurantCommand { Id = id };
             return await HandleExceptionAsync<DeleteResponse>(async () => await _mediator.SendAsync<DeleteRestaurantCommand, ErrorOr<DeleteResponse>>(command));
-        }
-
-        #endregion
-
-        #region MenuItem Endpoints
-
-        [HttpPost("CreateMenuItem")]
-        public async Task<ResponseDto> CreateMenuItem([FromBody] CreateMenuItemCommand command)
-        {
-            return await HandleExceptionAsync<PostResponse>(async () => await _mediator.SendAsync<CreateMenuItemCommand, ErrorOr<PostResponse>>(command));
-        }
-
-        [HttpPost("UpdateMenuItem")]
-        public async Task<ResponseDto> UpdateMenuItem([FromBody] UpdateMenuItemCommand command)
-        {
-            return await HandleExceptionAsync<PostResponse>(async () => await _mediator.SendAsync<UpdateMenuItemCommand, ErrorOr<PostResponse>>(command));
-        }
-
-        [HttpDelete("DeleteMenuItem/{id}")]
-        public async Task<ResponseDto> DeleteMenuItem(int id)
-        {
-            var command = new ReservationApp.core.api.Application.MenuItem.Commands.DeleteMenuItem.DeleteMenuItemCommand { ItemId = id };
-            return await HandleExceptionAsync<DeleteResponse>(async () => await _mediator.SendAsync<DeleteMenuItemCommand, ErrorOr<DeleteResponse>>(command));
         }
 
         #endregion

@@ -120,6 +120,17 @@ namespace ReservationApp.core.api.Infrastructure.Persistence.Repository
 
         }
 
+        public async Task ReduceCapacity(int restaurantId, int numberOfGuests)
+        {
+            Restaurant? restaurant = GetById(restaurantId);
+            if (restaurant != null)
+            {
+                restaurant.Capacity -= numberOfGuests;
+                _db.Restaurants.Update(restaurant);
+                await _db.SaveChangesAsync();
+            }
+        }
+
         private Restaurant? GetById(int id)
         {
             return _db.Restaurants

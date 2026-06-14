@@ -18,6 +18,6 @@ namespace ReservationApp.core.api.Domain
         public string? UserPhone { get; set; }
         public int? NumberOfGuests { get; set; }
         public DateTime? ReservationDate { get; set; }
-        public ICollection<ReservationMenuItem> ReservationMenuItems { get; set; } = new List<ReservationMenuItem>();
+        public List<ReservationMenuItem> ReservationMenuItems { get; set; } = new List<ReservationMenuItem>();
     }
 }

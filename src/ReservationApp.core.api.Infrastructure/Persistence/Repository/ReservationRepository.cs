@@ -1,56 +1,52 @@
-﻿using ErrorOr;
+﻿using Azure;
+using ErrorOr;
 using Microsoft.EntityFrameworkCore;
 using ReservationApp.core.api.Application.Common.Interfaces.Restaurant;
+using ReservationApp.core.api.Application.Common.Results;
 using ReservationApp.core.api.Application.MenuItem.Results;
 using ReservationApp.core.api.Application.Reservation.Commands.CreateReservation;
 using ReservationApp.core.api.Application.Reservation.Queries.GetReservationsForUser;
 using ReservationApp.core.api.Application.Reservation.Results;
 using ReservationApp.core.api.Domain;
-using ReservationApp.core.api.Infrastructure.Common.Util;
 using ReservationApp.core.api.Domain.Request;
+using ReservationApp.core.api.Infrastructure.Common.Util;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace ReservationApp.core.api.Infrastructure.Persistence.Repository
 {
-    public class ReservationRepository(AppDbContext _db) : IReservationRepository
+    public class ReservationRepository(AppDbContext _db, IRestaurantRepository _restaurantRepo) : IReservationRepository
     {
         public async Task<ErrorOr<CreateReservationResult>> CreateReservation(CreateReservationCommand command, CancellationToken token)
         {
             try
             {
                 // Map the command to a Reservation entity
-                Reservation reservation = new Reservation
-                {
-                    RestaurantId = command.RestaurantId,
-                    UserId = command.UserId,
-                    Name = command.UserName ?? string.Empty,
-                    UserEmail = command.UserEmail,
-                    UserPhone = command.UserPhone,
-                    NumberOfGuests = command.NumberOfGuests,
-                    ReservationDate = command.ReservationDate
-                };
+                Reservation reservation = command.ToReservation();
+                ErrorOr<bool> validation = ReservationValidator.Validate(reservation, _db);
+                if (validation.IsError) return validation.Errors;
+                 
                 _db.Reservations.Add(reservation);
 
+                //Add the menu items connected to the Reservation
                 ReservationMenuItem[] reservationMenuItems = command.MenuItems.Select(mi => new ReservationMenuItem
                 {
                     MenuItemId = mi.ItemId,
-                    Reservation = reservation
+                    Reservation = reservation // reference to the newly created reservation
                 }).ToArray();
-                _db.ReservationMenuItems.AddRange(reservationMenuItems);
 
+                _db.ReservationMenuItems.AddRange(reservationMenuItems);
                 _db.SaveChanges();
-                CreateReservationResult result = new CreateReservationResult
-                (
-                    reservation.RestaurantId.Value,
-                    reservation.UserId ?? string.Empty,
-                    reservation.NumberOfGuests,
-                    reservation.ReservationDate,
-                    0
-                );
+
+                //adjust the capacity of the restaurant
+                await _restaurantRepo.ReduceCapacity(reservation.RestaurantId.Value, reservation.NumberOfGuests.Value);
+
+                CreateReservationResult result = reservation.ToReservationResult();
                 return result;
             }
             catch(Exception ex)
