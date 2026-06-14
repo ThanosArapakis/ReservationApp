@@ -56,7 +56,7 @@ namespace ReservationApp.core.api.Infrastructure.Persistence.Repository
             }
             catch(Exception ex)
             {
-                return Error.Failure(description: ex.Message + ": " + ex.InnerException.Message);
+                return Error.Failure(description: ex.Message + ": " + ex.InnerException?.Message);
             }
         }
 
@@ -64,17 +64,17 @@ namespace ReservationApp.core.api.Infrastructure.Persistence.Repository
         {
             try
             {
-                List<Reservation> reservations = _db.Reservations.Where(r => r.UserId == command.UserId)
+                List<Reservation> reservations = await _db.Reservations.Where(r => r.UserId == command.UserId)
                     .Include(r => r.Restaurant)
                     .Include(r => r.ReservationMenuItems)
-                    .ThenInclude(rm => rm.MenuItem).ToList();
+                    .ThenInclude(rm => rm.MenuItem).ToListAsync();
 
                 List<GetReservationsForUserResult> result = reservations.ConvertAll(r => r.ToGetReservationResult()).ToList();
                 return result;
             }
             catch (Exception ex)
             {
-                return Error.Failure(description: ex.Message + ": " + ex.InnerException.Message);
+                return Error.Failure(description: ex.Message + ": " + ex.InnerException?.Message);
             }
         }
     }

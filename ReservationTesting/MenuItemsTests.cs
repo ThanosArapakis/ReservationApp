@@ -20,7 +20,7 @@ namespace ReservationTesting
         private readonly Mock<DbSet<Restaurant>> _mockRestaurantSet;
         private readonly Mock<DbSet<ReservationMenuItem>> _mockReservationMenuItemSet;
         private readonly Mock<AppDbContext> _mockContext;
-        private readonly IMenuItemRepository _repository;
+        private readonly MenuItemRepository _repository;
 
         public MenuItemsTests()
         {
@@ -172,8 +172,6 @@ namespace ReservationTesting
                 CategoryId = 2,
                 RestaurantId = 1
             };
-
-            var existingMenuItem = _testMenuItems.First();
 
             _mockContext.Setup(m => m.MenuItems.Update(It.IsAny<MenuItem>()));
             _mockContext.Setup(m => m.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);

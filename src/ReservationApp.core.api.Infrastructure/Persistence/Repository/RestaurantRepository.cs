@@ -28,9 +28,9 @@ namespace ReservationApp.core.api.Infrastructure.Persistence.Repository
         {
             try
             {
-                Restaurant? result = new Restaurant();
+                Restaurant? result;
                 if (filters.Count > 0) result = GetByFilters(filters);
-                else result = GetById(query.RestaurantId.Value);
+                else result = await GetById(query.RestaurantId.Value);
 
                 if (result == null) return Error.NotFound("NotFound", "Restaurant not found");
                 else
@@ -49,7 +49,7 @@ namespace ReservationApp.core.api.Infrastructure.Persistence.Repository
         {
             try
             {
-                List<Restaurant> result = _db.Restaurants.Include(r => r.MenuItems.Where(mi => mi.Available)).ToList();
+                List<Restaurant> result = await _db.Restaurants.Include(r => r.MenuItems.Where(mi => mi.Available)).ToListAsync();
                 return result.ConvertAll(RepoMapper.ToRestaurantResult);
             }
             catch (Exception ex)
@@ -87,7 +87,7 @@ namespace ReservationApp.core.api.Infrastructure.Persistence.Repository
 
         public async Task<ErrorOr<DeleteResponse>> DeleteRestaurant(DeleteRestaurantCommand command)
         {
-            Restaurant? restaurant = GetById(command.Id);
+            Restaurant? restaurant = await GetById(command.Id);
             if (restaurant == null) return Error.NotFound("NotFound", "Restaurant not found");
             try
             {
@@ -113,7 +113,7 @@ namespace ReservationApp.core.api.Infrastructure.Persistence.Repository
 
         public async Task<ErrorOr<PostResponse>> UpdateRestaurantAsync(UpdateRestaurantCommand command)
         {
-            Restaurant? restaurant = GetById(command.Id);
+            Restaurant? restaurant = await GetById(command.Id);
             if (restaurant == null) return Error.NotFound("NotFound", "Restaurant not found");
             try
             {
@@ -137,14 +137,14 @@ namespace ReservationApp.core.api.Infrastructure.Persistence.Repository
 
         private async Task<ErrorOr<bool>> InitalizeDailyCapacityAsync(int restaurantId)
         {
-            Restaurant? restaurant = GetById(restaurantId);
+            Restaurant? restaurant = await GetById(restaurantId);
             if (restaurant == null) return Error.NotFound("NotFound", "Restaurant not found");
             try
             {
                 for (int i = 0; i < Const.CapacityInit; i++)
                 {
                     DateTime date = DateTime.Now.Date.AddDays(i);
-                    RestaurantDailyCapacity? dailyCapacity = _db.RestaurantDailyCapacity.FirstOrDefault(rdc => rdc.RestaurantId == restaurantId && rdc.Date.Date == date);
+                    RestaurantDailyCapacity? dailyCapacity = await _db.RestaurantDailyCapacity.FirstOrDefaultAsync(rdc => rdc.RestaurantId == restaurantId && rdc.Date.Date == date);
                     if (dailyCapacity == null)
                     {
                         dailyCapacity = new RestaurantDailyCapacity
@@ -167,8 +167,8 @@ namespace ReservationApp.core.api.Infrastructure.Persistence.Repository
 
         public async Task<bool> CheckCapacity(int restaurantId, int numberOfGuests, DateTime reservationDate)
         {
-            Restaurant? restaurant = GetById(restaurantId);
-            RestaurantDailyCapacity? dailyCapacity = _db.RestaurantDailyCapacity.FirstOrDefault(rdc => rdc.RestaurantId == restaurantId && rdc.Date.Date == reservationDate.Date);
+            Restaurant? restaurant = await GetById(restaurantId);
+            RestaurantDailyCapacity? dailyCapacity = await _db.RestaurantDailyCapacity.FirstOrDefaultAsync(rdc => rdc.RestaurantId == restaurantId && rdc.Date.Date == reservationDate.Date);
             
             if (dailyCapacity != null) return dailyCapacity.Capacity >= numberOfGuests;
 
@@ -177,8 +177,8 @@ namespace ReservationApp.core.api.Infrastructure.Persistence.Repository
 
         public async Task ReduceCapacity(int restaurantId, int numberOfGuests, DateTime reservationDate)
         {
-            Restaurant? restaurant = GetById(restaurantId);
-            RestaurantDailyCapacity? dailyCapacity = _db.RestaurantDailyCapacity.FirstOrDefault(rdc => rdc.RestaurantId == restaurantId && rdc.Date.Date == reservationDate.Date);
+            Restaurant? restaurant = await GetById(restaurantId);
+            RestaurantDailyCapacity? dailyCapacity = await _db.RestaurantDailyCapacity.FirstOrDefaultAsync(rdc => rdc.RestaurantId == restaurantId && rdc.Date.Date == reservationDate.Date);
 
             if (dailyCapacity != null)
             {
@@ -187,17 +187,17 @@ namespace ReservationApp.core.api.Infrastructure.Persistence.Repository
             }
         }
 
-        private Restaurant? GetById(int id)
+        private async Task<Restaurant>? GetById(int id)
         {
-            return _db.Restaurants
+            return await _db.Restaurants
                 .AsNoTracking()
                 .Include(r => r.MenuItems.Where(mi => mi.Available))
-                .FirstOrDefault(r => r.Id == id);
+                .FirstOrDefaultAsync(r => r.Id == id);
         }
 
         private Restaurant? GetByFilters(List<Expression<Func<Domain.Restaurant, bool>>> filters)
         {
-            Restaurant? result = new Restaurant();
+            Restaurant? result;
             IQueryable<Restaurant> queryable = _db.Restaurants
                         .AsNoTracking()
                         .Include(r => r.MenuItems.Where(mi => mi.Available));
