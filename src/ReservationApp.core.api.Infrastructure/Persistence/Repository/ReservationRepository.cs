@@ -23,6 +23,7 @@ namespace ReservationApp.core.api.Infrastructure.Persistence.Repository
 {
     public class ReservationRepository(AppDbContext _db, IRestaurantRepository _restaurantRepo) : IReservationRepository
     {
+
         public async Task<ErrorOr<CreateReservationResult>> CreateReservation(CreateReservationCommand command, CancellationToken token)
         {
             try
@@ -76,6 +77,40 @@ namespace ReservationApp.core.api.Infrastructure.Persistence.Repository
             {
                 return Error.Failure(description: ex.Message + ": " + ex.InnerException?.Message);
             }
+        }
+
+        public async Task<ErrorOr<PostResponse>> ConfirmAppointment(int appointmentId, CancellationToken cancellationToken)
+        {
+            try
+            {
+                Reservation? reservation = await GetByIdAsync(appointmentId, cancellationToken);
+                if (reservation == null)
+                {
+                    return CustomErrors.ReservationNotFound;
+                }
+                reservation.Status = ReservationStatus.Confirmed.Value;
+                await _db.SaveChangesAsync(cancellationToken);
+
+                return new PostResponse(reservation.RestaurantId);
+            }
+            catch (Exception ex)
+            {
+                return Error.Failure(description: ex.Message + ": " + ex.InnerException?.Message);
+            }
+        }
+
+        private async Task<Reservation> GetByIdAsync(int reservationId, CancellationToken cancellationToken)
+        {
+            Reservation? reservation = await _db.Reservations
+                .Include(r => r.Restaurant)
+                .Include(r => r.ReservationMenuItems)
+                .ThenInclude(rm => rm.MenuItem)
+                .FirstOrDefaultAsync(r => r.Id == reservationId, cancellationToken);
+            if (reservation == null)
+            {
+                throw new KeyNotFoundException($"Reservation with ID {reservationId} not found.");
+            }
+            return reservation;
         }
     }
 }

@@ -21,7 +21,7 @@ namespace ReservationApp.core.api.Controllers
     [Route("restaurant")]
     [ApiController]
     [Tags("Restaurants")]
-    public partial class RestaurantApiController(IMediatorBus _mediator, ILogger<RestaurantApiController> _logger) : BaseApiController<RestaurantApiController>(_logger)
+    public class RestaurantApiController(IMediatorBus _mediator, ILogger<RestaurantApiController> _logger) : BaseApiController<RestaurantApiController>(_logger)
     {
         #region Restaurant Endpoints
 

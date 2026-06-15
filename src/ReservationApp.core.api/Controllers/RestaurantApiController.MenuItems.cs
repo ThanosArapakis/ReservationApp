@@ -15,8 +15,8 @@ namespace ReservationApp.core.api.Controllers
     /// <remarks>Contains Menu Item Endpoints</remarks>
     [Route("restaurant")]
     [ApiController]
-    [Tags("MenuItems")]
-    public class RestaurantController(IMediatorBus _mediator, ILogger<RestaurantApiController> _logger) : BaseApiController<RestaurantApiController>(_logger)
+    [Tags("Menu Items")]
+    public class MenuItemController(IMediatorBus _mediator, ILogger<RestaurantApiController> _logger) : BaseApiController<RestaurantApiController>(_logger)
     {
         [HttpPost("CreateMenuItem")]
         public async Task<ResponseDto> CreateMenuItem([FromBody] CreateMenuItemCommand command)
