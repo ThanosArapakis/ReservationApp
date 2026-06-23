@@ -10,9 +10,9 @@ using System.Threading.Tasks;
 
 namespace ReservationApp.core.api.Application.Reservation.Commands.ConfirmAppointment
 {
-    public class ConfirmAppointmentCommandHandler(IReservationRepository _repo) : ICommandHandler<ConfirmAppointmentCommand, ErrorOr<PostResponse>>
+    public class ManageStatusCommandHandler(IReservationRepository _repo) : ICommandHandler<ManageStatusCommand, ErrorOr<PostResponse>>
     {
-        public Task<ErrorOr<PostResponse>> HandleAsync(ConfirmAppointmentCommand command, CancellationToken cancellationToken = default)
-        => _repo.ConfirmAppointment(command.AppointmentId, cancellationToken);
+        public Task<ErrorOr<PostResponse>> HandleAsync(ManageStatusCommand command, CancellationToken cancellationToken = default)
+        => _repo.ManageStatus(command.AppointmentId, command.Status, cancellationToken);
     }
 }

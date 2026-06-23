@@ -2,7 +2,9 @@
 using ErrorOr;
 using Microsoft.EntityFrameworkCore;
 using ReservationApp.core.api.Application.Common;
+using ReservationApp.core.api.Application.Common.Interfaces.Notifications;
 using ReservationApp.core.api.Application.Common.Interfaces.Restaurant;
+using ReservationApp.core.api.Application.Common.Notifications;
 using ReservationApp.core.api.Application.Common.Results;
 using ReservationApp.core.api.Application.MenuItem.Results;
 using ReservationApp.core.api.Application.Reservation.Commands.CreateReservation;
@@ -21,7 +23,7 @@ using System.Threading.Tasks;
 
 namespace ReservationApp.core.api.Infrastructure.Persistence.Repository
 {
-    public class ReservationRepository(AppDbContext _db, IRestaurantRepository _restaurantRepo) : IReservationRepository
+    public class ReservationRepository(AppDbContext _db, IRestaurantRepository _restaurantRepo, INotificationService _notifications) : IReservationRepository
     {
 
         public async Task<ErrorOr<CreateReservationResult>> CreateReservation(CreateReservationCommand command, CancellationToken token)
@@ -52,6 +54,21 @@ namespace ReservationApp.core.api.Infrastructure.Persistence.Repository
 
                 await _db.SaveChangesAsync();
 
+                // Always publishes to the broker; the factory adds the email channel
+                // automatically when the reservation carries a UserEmail.
+                await _notifications.NotifyAsync(new NotificationMessage
+                {
+                    RecipientId = reservation.UserId,
+                    RecipientEmail = reservation.UserEmail,
+                    Subject = "Reservation received",
+                    Body = $"Your reservation for {reservation.NumberOfGuests} guest(s) on {reservation.ReservationDate.Value.ToString("dd/mm/yyyy")} has been received.",
+                    Metadata = new Dictionary<string, string>
+                    {
+                        ["reservationId"] = reservation.Id.ToString(),
+                        ["restaurantId"] = reservation.RestaurantId.ToString()
+                    }
+                }, token);
+
                 CreateReservationResult result = reservation.ToReservationResult();
                 return result;
             }
@@ -79,7 +96,7 @@ namespace ReservationApp.core.api.Infrastructure.Persistence.Repository
             }
         }
 
-        public async Task<ErrorOr<PostResponse>> ConfirmAppointment(int appointmentId, CancellationToken cancellationToken)
+        public async Task<ErrorOr<PostResponse>> ManageStatus(int appointmentId, ReservationStatus newStatus, CancellationToken cancellationToken)
         {
             try
             {
@@ -88,7 +105,7 @@ namespace ReservationApp.core.api.Infrastructure.Persistence.Repository
                 {
                     return CustomErrors.ReservationNotFound;
                 }
-                reservation.Status = ReservationStatus.Confirmed.Value;
+                reservation.Status = newStatus.Value;
                 await _db.SaveChangesAsync(cancellationToken);
 
                 return new PostResponse(reservation.RestaurantId);

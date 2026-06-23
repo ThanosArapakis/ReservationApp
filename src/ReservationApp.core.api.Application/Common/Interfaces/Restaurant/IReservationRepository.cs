@@ -14,7 +14,7 @@ namespace ReservationApp.core.api.Application.Common.Interfaces.Restaurant
 {
     public interface IReservationRepository
     {
-        Task<ErrorOr<PostResponse>> ConfirmAppointment(int appointmentId, CancellationToken cancellationToken);
+        Task<ErrorOr<PostResponse>> ManageStatus(int appointmentId, ReservationStatus newStatus, CancellationToken cancellationToken);
         Task<ErrorOr<CreateReservationResult>> CreateReservation(CreateReservationCommand command, CancellationToken token);
         Task<ErrorOr<List<GetReservationsForUserResult>>> GetReservationsForUserAsync(GetReservationQuery command);
     }

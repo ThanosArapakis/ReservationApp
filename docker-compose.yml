@@ -1,0 +1,100 @@
+name: reservationapp
+
+# Local "Localhost" environment: the API plus its dependencies, all in containers.
+# Bring it up with:  docker compose up --build
+services:
+  api:
+    build:
+      context: .
+      dockerfile: src/ReservationApp.core.api/Dockerfile
+    container_name: reservationapp-api
+    environment:
+      ASPNETCORE_ENVIRONMENT: Localhost
+      ASPNETCORE_HTTP_PORTS: "8080"
+    ports:
+      - "8080:8080"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - reservation-net
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: reservationapp-sqlserver
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "Local_Dev_Pass123!"
+      MSSQL_PID: "Developer"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver-data:/var/opt/mssql
+    healthcheck:
+      # SELECT 1 over sqlcmd; -C trusts the container's self-signed cert.
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -C -Q \"SELECT 1\" || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks:
+      - reservation-net
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: reservationapp-rabbitmq
+    environment:
+      # Custom creds: the default "guest" user is refused for non-localhost
+      # (cross-container) connections.
+      RABBITMQ_DEFAULT_USER: "reservation"
+      RABBITMQ_DEFAULT_PASS: "reservation_local"
+    ports:
+      - "5672:5672"    # AMQP
+      - "15672:15672"  # Management UI -> http://localhost:15672
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    networks:
+      - reservation-net
+
+  # Local email catcher for the SMTP notification channel. SMTP on 1025, UI on 8025.
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: reservationapp-mailpit
+    ports:
+      - "1025:1025"  # SMTP
+      - "8025:8025"  # Web UI -> http://localhost:8025
+    networks:
+      - reservation-net
+
+  redis:
+    image: redis:7-alpine
+    container_name: reservationapp-cache
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - reservation-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  sqlserver-data:
+  rabbitmq-data:
+  redis-data:
+
+networks:
+  reservation-net:
+    driver: bridge
+

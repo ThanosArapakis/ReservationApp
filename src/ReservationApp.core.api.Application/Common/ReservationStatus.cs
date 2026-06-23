@@ -18,6 +18,7 @@ namespace ReservationApp.core.api.Application.Common
         public static readonly ReservationStatus Cancelled = new CancelledStatus();
         public static readonly ReservationStatus Completed = new CompletedStatus();
         public static readonly ReservationStatus NoShow = new NoShowStatus();
+        public static readonly ReservationStatus Rescheduled = new RescheduledStatus();
 
         private sealed class PendingStatus : ReservationStatus
         {
@@ -43,5 +44,10 @@ namespace ReservationApp.core.api.Application.Common
         {
             public NoShowStatus() : base(4, "Δεν εμφανίστηκε") { }
         }
-    }
+
+        private sealed class RescheduledStatus : ReservationStatus
+        {
+            public RescheduledStatus() : base(5, "Μετατέθηκε") { }
+        }
+}
 }

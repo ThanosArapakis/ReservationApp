@@ -2,7 +2,10 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using ReservationApp.core.api.Application.Common.Interfaces.Notifications;
 using ReservationApp.core.api.Application.Common.Interfaces.Restaurant;
+using ReservationApp.core.api.Infrastructure.Notifications;
+using ReservationApp.core.api.Infrastructure.Notifications.Senders;
 using ReservationApp.core.api.Infrastructure.Persistence;
 using ReservationApp.core.api.Infrastructure.Persistence.Repository;
 using System;
@@ -21,6 +24,7 @@ namespace ReservationApp.core.api.Infrastructure
             services
             .AddHttpClients()
             .AddServices()
+            .AddNotifications()
             .AddDatabases(configuration);
 
         private static IServiceCollection AddHttpClients(this IServiceCollection services)
@@ -33,6 +37,19 @@ namespace ReservationApp.core.api.Infrastructure
             services.AddScoped<IRestaurantRepository, RestaurantRepository>();
             services.AddScoped<IMenuItemRepository, MenuItemRepository>();
             services.AddScoped<IReservationRepository, ReservationRepository>();
+            return services;
+        }
+
+        private static IServiceCollection AddNotifications(this IServiceCollection services)
+        {
+            // Register one sender per channel. They are all resolved together as
+            // IEnumerable<INotificationSender> by the factory — adding a channel later is
+            // just another line here.
+            services.AddScoped<INotificationSender, MessageBrokerNotificationSender>();
+            services.AddScoped<INotificationSender, EmailNotificationSender>();
+
+            services.AddScoped<INotificationSenderFactory, NotificationSenderFactory>();
+            services.AddScoped<INotificationService, NotificationService>();
             return services;
         }
 
