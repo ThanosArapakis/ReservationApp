@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using RabbitMQ.Client;
 
 namespace ReservationApp.core.api.Infrastructure
 {
@@ -24,7 +25,7 @@ namespace ReservationApp.core.api.Infrastructure
             services
             .AddHttpClients()
             .AddServices()
-            .AddNotifications()
+            .AddNotifications(configuration)
             .AddDatabases(configuration);
 
         private static IServiceCollection AddHttpClients(this IServiceCollection services)
@@ -40,8 +41,12 @@ namespace ReservationApp.core.api.Infrastructure
             return services;
         }
 
-        private static IServiceCollection AddNotifications(this IServiceCollection services)
+        private static IServiceCollection AddNotifications(this IServiceCollection services, IConfiguration configuration)
         {
+            // Bind RabbitMq config and share one connection across the app.
+            services.Configure<RabbitMqOptions>(configuration.GetSection(RabbitMqOptions.SectionName));
+            services.AddSingleton<IRabbitMqConnection, RabbitMqConnection>();
+
             // Register one sender per channel. They are all resolved together as
             // IEnumerable<INotificationSender> by the factory — adding a channel later is
             // just another line here.

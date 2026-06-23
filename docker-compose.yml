@@ -9,7 +9,7 @@ services:
       dockerfile: src/ReservationApp.core.api/Dockerfile
     container_name: reservationapp-api
     environment:
-      ASPNETCORE_ENVIRONMENT: Localhost
+      ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_HTTP_PORTS: "8080"
     ports:
       - "8080:8080"
